@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ทักทาย & เช็กสถานะ</title>
+  <link rel="preconnect" href="https://googleapis.com">
+  <link rel="preconnect" href="https://gstatic.com" crossorigin>
+  <link href="https://googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-1: #0f172a;
+      --bg-2: #1e1b4b;
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --card-border: rgba(255, 255, 255, 0.16);
+      --text-main: #f8fafc;
+      --text-muted: #cbd5e1;
+      --accent: #818cf8;
+      --accent-hover: #6366f1;
+      --success: #34d399;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Prompt', sans-serif;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      color: var(--text-main);
+      background: radial-gradient(circle at top left, #312e81, transparent 45%),
+                  radial-gradient(circle at bottom right, #0f766e, transparent 45%),
+                  linear-gradient(135deg, var(--bg-1), var(--bg-2));
+    }
+
+    .card {
+      width: 100%;
+      max-width: 460px;
+      background: var(--card-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 32px 28px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #c7d2fe;
+      background: rgba(129, 140, 248, 0.18);
+      border: 1px solid rgba(129, 140, 248, 0.35);
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-size: 1.55rem;
+      font-weight: 600;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .step {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .step.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #e2e8f0;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 13px 16px;
+      font-family: inherit;
+      font-size: 1rem;
+      color: var(--text-main);
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 14px;
+      outline: none;
+      margin-bottom: 14px;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.25);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 13px 18px;
+      font-family: inherit;
+      font-size: 0.98rem;
+      font-weight: 500;
+      color: #ffffff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .quick-choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .chip-btn {
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .feedback {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback.info {
+      background: rgba(251, 191, 36, 0.14);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: #fde68a;
+    }
+
+    .result-box {
+      text-align: center;
+      padding: 12px 0 6px;
+    }
+
+    .result-emoji {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    .result-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--success);
+    }
+
+    .result-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 22px;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <span class="badge"> KOl </span>
+
+    <!-- Step 1: ถามชื่อ -->
+    <section id="step-name" class="step active">
+      <h1>พิมพ์ชื่อ</h1>
+      <p class="subtitle">ชื่อ<p>
+      <label for="name-input">ชื่ออะไร:</label>
+      <input
+        id="name-input"
+        type="text"
+        placeholder="พิมพ์ชื่อของคุณ..."
+        autocomplete="off"
+      />
+      <button type="button" class="btn" onclick="submitName()">ถัดไป</button>
+      <div id="name-feedback" class="feedback"></div>
+    </section>
+
+    <!-- Step 2: วนลูปถามจนกว่าจะตอบ เต็ม หรือ ไม่ -->
+    <section id="step-question" class="step">
+      <h1 id="greeting-title">สวัสดี</h1>
+      <p class="subtitle">ตอบแค่ <strong>เต็ม</strong> หรือ <strong>ไม่</strong> เท่านั้นนะ</p>
+
+      <div class="quick-choices">
+        <button type="button" class="chip-btn" onclick="submitAnswer('เต็ม')">เต็ม</button>
+        <button type="button" class="chip-btn" onclick="submitAnswer('ไม่')">ไม่</button>
+      </div>
+
+      <label for="answer-input">มึงเต็มไหม (ตอบแค่ เต็ม หรือ ไม่):</label>
+      <input
+        id="answer-input"
+        type="text"
+        placeholder="พิมพ์คำตอบ..."
+        autocomplete="off"
+      />
+      <button type="button" class="btn" onclick="submitAnswer()">ส่งคำตอบ</button>
+
+      <div id="feedback" class="feedback"></div>
+    </section>
+
+    <!-- Step 3: แสดงผลลัพธ์ -->
+    <section id="step-result" class="step">
+      <div class="result-box">
+        <div id="result-emoji" class="result-emoji">😎</div>
+        <div id="result-text" class="result-title">นั้นไงว่าแล้ว</div>
+        <p id="result-sub" class="result-desc"></p>
+        <button type="button" class="btn btn-secondary" onclick="restartApp()">เริ่มใหม่อีกครั้ง</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    var userName = '';
+
+    function showStep(stepId) {
+      document.getElementById('step-name').classList.remove('active');
+      document.getElementById('step-question').classList.remove('active');
+      document.getElementById('step-result').classList.remove('active');
+      document.getElementById(stepId).classList.add('active');
+    }
+
+    function submitName() {
+      var nameInput = document.getElementById('name-input');
+      var nameFeedback = document.getElementById('name-feedback');
+      var cleaned = nameInput.value.trim();
+
+      if (!cleaned) {
+        nameFeedback.className = 'feedback info show';
+        nameFeedback.textContent = 'กรุณาพิมพ์ชื่อก่อนกดถัดไปครับ';
+        nameInput.focus();
+        return;
+      }
+
+      userName = cleaned;
+      nameFeedback.className = 'feedback';
+      document.getElementById('greeting-title').textContent = 'สวัสดี ' + userName;
+      document.getElementById('feedback').className = 'feedback';
+      showStep('step-question');
+      document.getElementById('answer-input').focus();
+    }
+
+    function submitAnswer(presetVal) {
+      var answerInput = document.getElementById('answer-input');
+      var feedback = document.getElementById('feedback');
+      var na = (presetVal !== undefined ? presetVal : answerInput.value).trim();
+
+      if (na === 'ไม่') {
+        document.getElementById('result-emoji').textContent = '😏';
+        document.getElementById('result-text').textContent = 'นั้นไงว่าแล้ว';
+        document.getElementById('result-sub').textContent = 'ยืนยันเรียบร้อยสำหรับ ' + userName;
+        showStep('step-result');
+      } else if (na === 'เต็ม') {
+        document.getElementById('result-emoji').textContent = '🤨';
+        document.getElementById('result-text').textContent = 'ไม่น่านะ';
+        document.getElementById('result-sub').textContent = 'บันทึกคำตอบของ ' + userName + ' แล้ว';
+        showStep('step-result');
+      } else {
+        feedback.className = 'feedback info show';
+        feedback.innerHTML = 'กำลังคิดอยู่ — <strong>ให้ตอบใหม่</strong> (พิมพ์แค่ <em>เต็ม</em> หรือ <em>ไม่</em>)';
+        answerInput.value = '';
+        answerInput.focus();
+      }
+    }
+
+    function restartApp() {
+      document.getElementById('name-input').value = '';
+      document.getElementById('answer-input').value = '';
+      document.getElementById('name-feedback').className = 'feedback';
+      document.getElementById('feedback').className = 'feedback';
+      showStep('step-name');
+    }
+
+    document.getElementById('name-input').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') submitName();
+    });
+
+    document.getElementById('answer-input').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') submitAnswer();
+    });
+  </script>
+</body>
+</html>
