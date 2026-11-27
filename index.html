@@ -1,325 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ทักทาย & เช็กสถานะ</title>
-  <link rel="preconnect" href="https://googleapis.com">
-  <link rel="preconnect" href="https://gstatic.com" crossorigin>
-  <link href="https://googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-1: #0f172a;
-      --bg-2: #1e1b4b;
-      --card-bg: rgba(255, 255, 255, 0.08);
-      --card-border: rgba(255, 255, 255, 0.16);
-      --text-main: #f8fafc;
-      --text-muted: #cbd5e1;
-      --accent: #818cf8;
-      --accent-hover: #6366f1;
-      --success: #34d399;
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Prompt', sans-serif;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-      color: var(--text-main);
-      background: radial-gradient(circle at top left, #312e81, transparent 45%),
-                  radial-gradient(circle at bottom right, #0f766e, transparent 45%),
-                  linear-gradient(135deg, var(--bg-1), var(--bg-2));
-    }
-
-    .card {
-      width: 100%;
-      max-width: 460px;
-      background: var(--card-bg);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid var(--card-border);
-      border-radius: 24px;
-      padding: 32px 28px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
-    }
-
-    .badge {
-      display: inline-block;
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: #c7d2fe;
-      background: rgba(129, 140, 248, 0.18);
-      border: 1px solid rgba(129, 140, 248, 0.35);
-      padding: 4px 12px;
-      border-radius: 999px;
-      margin-bottom: 14px;
-    }
-
-    h1 {
-      font-size: 1.55rem;
-      font-weight: 600;
-      line-height: 1.35;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      font-size: 0.92rem;
-      color: var(--text-muted);
-      margin-bottom: 24px;
-      line-height: 1.6;
-    }
-
-    .step {
-      display: none;
-      animation: fadeIn 0.35s ease;
-    }
-
-    .step.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    label {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: 500;
-      margin-bottom: 8px;
-      color: #e2e8f0;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 13px 16px;
-      font-family: inherit;
-      font-size: 1rem;
-      color: var(--text-main);
-      background: rgba(15, 23, 42, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: 14px;
-      outline: none;
-      margin-bottom: 14px;
-    }
-
-    input[type="text"]:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.25);
-    }
-
-    .btn {
-      width: 100%;
-      padding: 13px 18px;
-      font-family: inherit;
-      font-size: 0.98rem;
-      font-weight: 500;
-      color: #ffffff;
-      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-      border: none;
-      border-radius: 14px;
-      cursor: pointer;
-    }
-
-    .btn:active {
-      transform: scale(0.98);
-    }
-
-    .quick-choices {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
-    .chip-btn {
-      padding: 10px 12px;
-      font-family: inherit;
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: #e2e8f0;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: 12px;
-      cursor: pointer;
-    }
-
-    .feedback {
-      margin-top: 14px;
-      padding: 12px 14px;
-      border-radius: 12px;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      display: none;
-    }
-
-    .feedback.show {
-      display: block;
-    }
-
-    .feedback.info {
-      background: rgba(251, 191, 36, 0.14);
-      border: 1px solid rgba(251, 191, 36, 0.35);
-      color: #fde68a;
-    }
-
-    .result-box {
-      text-align: center;
-      padding: 12px 0 6px;
-    }
-
-    .result-emoji {
-      font-size: 3rem;
-      margin-bottom: 10px;
-    }
-
-    .result-title {
-      font-size: 1.4rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--success);
-    }
-
-    .result-desc {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-bottom: 22px;
-    }
-
-    .btn-secondary {
-      background: rgba(255, 255, 255, 0.12);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-  </style>
-</head>
-<body>
-  <main class="card">
-    <span class="badge"> KOl </span>
-
-    <!-- Step 1: ถามชื่อ -->
-    <section id="step-name" class="step active">
-      <h1>พิมพ์ชื่อ</h1>
-      <p class="subtitle">ชื่อ<p>
-      <label for="name-input">ชื่ออะไร:</label>
-      <input
-        id="name-input"
-        type="text"
-        placeholder="พิมพ์ชื่อของคุณ..."
-        autocomplete="off"
-      />
-      <button type="button" class="btn" onclick="submitName()">ถัดไป</button>
-      <div id="name-feedback" class="feedback"></div>
-    </section>
-
-    <!-- Step 2: วนลูปถามจนกว่าจะตอบ เต็ม หรือ ไม่ -->
-    <section id="step-question" class="step">
-      <h1 id="greeting-title">สวัสดี</h1>
-      <p class="subtitle">ตอบแค่ <strong>เต็ม</strong> หรือ <strong>ไม่</strong> เท่านั้นนะ</p>
-
-      <div class="quick-choices">
-        <button type="button" class="chip-btn" onclick="submitAnswer('เต็ม')">เต็ม</button>
-        <button type="button" class="chip-btn" onclick="submitAnswer('ไม่')">ไม่</button>
-      </div>
-
-      <label for="answer-input">มึงเต็มไหม (ตอบแค่ เต็ม หรือ ไม่):</label>
-      <input
-        id="answer-input"
-        type="text"
-        placeholder="พิมพ์คำตอบ..."
-        autocomplete="off"
-      />
-      <button type="button" class="btn" onclick="submitAnswer()">ส่งคำตอบ</button>
-
-      <div id="feedback" class="feedback"></div>
-    </section>
-
-    <!-- Step 3: แสดงผลลัพธ์ -->
-    <section id="step-result" class="step">
-      <div class="result-box">
-        <div id="result-emoji" class="result-emoji">😎</div>
-        <div id="result-text" class="result-title">นั้นไงว่าแล้ว</div>
-        <p id="result-sub" class="result-desc"></p>
-        <button type="button" class="btn btn-secondary" onclick="restartApp()">เริ่มใหม่อีกครั้ง</button>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    var userName = '';
-
-    function showStep(stepId) {
-      document.getElementById('step-name').classList.remove('active');
-      document.getElementById('step-question').classList.remove('active');
-      document.getElementById('step-result').classList.remove('active');
-      document.getElementById(stepId).classList.add('active');
-    }
-
-    function submitName() {
-      var nameInput = document.getElementById('name-input');
-      var nameFeedback = document.getElementById('name-feedback');
-      var cleaned = nameInput.value.trim();
-
-      if (!cleaned) {
-        nameFeedback.className = 'feedback info show';
-        nameFeedback.textContent = 'กรุณาพิมพ์ชื่อก่อนกดถัดไปครับ';
-        nameInput.focus();
-        return;
-      }
-
-      userName = cleaned;
-      nameFeedback.className = 'feedback';
-      document.getElementById('greeting-title').textContent = 'สวัสดี ' + userName;
-      document.getElementById('feedback').className = 'feedback';
-      showStep('step-question');
-      document.getElementById('answer-input').focus();
-    }
-
-    function submitAnswer(presetVal) {
-      var answerInput = document.getElementById('answer-input');
-      var feedback = document.getElementById('feedback');
-      var na = (presetVal !== undefined ? presetVal : answerInput.value).trim();
-
-      if (na === 'ไม่') {
-        document.getElementById('result-emoji').textContent = '😏';
-        document.getElementById('result-text').textContent = 'นั้นไงว่าแล้ว';
-        document.getElementById('result-sub').textContent = 'ยืนยันเรียบร้อยสำหรับ ' + userName;
-        showStep('step-result');
-      } else if (na === 'เต็ม') {
-        document.getElementById('result-emoji').textContent = '🤨';
-        document.getElementById('result-text').textContent = 'ไม่น่านะ';
-        document.getElementById('result-sub').textContent = 'บันทึกคำตอบของ ' + userName + ' แล้ว';
-        showStep('step-result');
-      } else {
-        feedback.className = 'feedback info show';
-        feedback.innerHTML = 'กำลังคิดอยู่ — <strong>ให้ตอบใหม่</strong> (พิมพ์แค่ <em>เต็ม</em> หรือ <em>ไม่</em>)';
-        answerInput.value = '';
-        answerInput.focus();
-      }
-    }
-
-    function restartApp() {
-      document.getElementById('name-input').value = '';
-      document.getElementById('answer-input').value = '';
-      document.getElementById('name-feedback').className = 'feedback';
-      document.getElementById('feedback').className = 'feedback';
-      showStep('step-name');
-    }
-
-    document.getElementById('name-input').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') submitName();
-    });
-
-    document.getElementById('answer-input').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') submitAnswer();
-    });
-  </script>
-</body>
-</html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#090d18"><title>RBLX AI</title>
+<style>
+:root{--bg:#090d18;--panel:#111a2b;--panel2:#17233a;--line:#273754;--txt:#edf3ff;--muted:#94a4bf;--blue:#5794ff;--purple:#9a70ff;--green:#45d69b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:14px system-ui,-apple-system,sans-serif}button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}.app{max-width:760px;margin:auto;min-height:100dvh;padding-bottom:82px;background:radial-gradient(ellipse at 50% -15%,#1d3261 0,transparent 48%),var(--bg)}
+header{height:62px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff12;position:sticky;top:0;background:#090d18ed;backdrop-filter:blur(14px);z-index:5}.brand{display:flex;gap:10px;align-items:center;font-weight:850;letter-spacing:.6px}.logo{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,#3988ff,#9a62ff);font-size:13px}.chip{font-size:10px;padding:6px 9px;border:1px solid var(--line);border-radius:30px;color:#a9c5ff}
+main{padding:18px 14px}.hero{padding:15px 3px 18px}.eyebrow{font-size:10px;letter-spacing:2px;color:#91b8ff}.hero h1{font-size:30px;line-height:1.12;margin:9px 0}.hero h1 span{color:#9b83ff}.sub{color:var(--muted);font-size:12px;line-height:1.6;margin:0}
+.tabs{display:flex;gap:7px;overflow:auto;padding:4px 0 13px;scrollbar-width:none}.tab{white-space:nowrap;padding:9px 13px;border-radius:10px;background:#111a2b;color:#9eacc4;border:1px solid #24324b;font-size:12px}.tab.active{background:#263c67;border-color:#5488eb;color:white}
+.page{display:none}.page.active{display:block}.card{background:linear-gradient(145deg,#131e32,#101827);border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:12px;box-shadow:0 10px 28px #0002}.cardhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}.title{font-weight:750;font-size:14px}.muted{color:var(--muted);font-size:11px;line-height:1.6}.status{font-size:10px;color:#ffd27c;background:#4b391e66;padding:6px 9px;border-radius:20px}.status.ok{color:#75e9b4;background:#164b3866}
+label{display:block;color:#a9b8d1;font-size:11px;margin:12px 0 6px}input,textarea{width:100%;border:1px solid #30415f;background:#0a1220;color:white;border-radius:11px;padding:12px;outline:none;font-size:13px}input:focus,textarea:focus{border-color:#6696ff}textarea{resize:vertical;min-height:100px;line-height:1.5}
+.btn{padding:11px 14px;border-radius:11px;background:#202e47;border:1px solid #354967;font-weight:700;font-size:12px}.primary{background:linear-gradient(100deg,#347ef2,#8059e8);border:0;color:white}.full{width:100%;margin-top:10px}.row{display:flex;gap:8px;align-items:center}.row>*{min-width:0}.row input{flex:1}.roomid{font:11px ui-monospace,monospace;color:#a9c8ff;overflow-wrap:anywhere}
+.chatbox{min-height:250px;max-height:48vh;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:3px 0 12px}.bubble{max-width:91%;padding:11px 12px;border-radius:13px;font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.user{align-self:flex-end;background:#294b83}.assistant{align-self:flex-start;background:#1b2940;border:1px solid #2b3d5b}.composer{display:flex;gap:8px;align-items:flex-end}.composer textarea{min-height:48px;max-height:120px;flex:1}.send{width:48px;height:48px;background:linear-gradient(135deg,#438dff,#8a5cf0);border-radius:13px;font-size:18px}
+.codearea{min-height:300px;font:12px/1.6 ui-monospace,SFMono-Regular,monospace;white-space:pre;tab-size:2}.smallbtn{padding:8px 10px;font-size:10px}.keynote{border:1px solid #765a31;background:#3a2b1766;border-radius:10px;padding:10px;color:#e8ca91;font-size:10px;line-height:1.55;margin-top:10px}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#0b1120f2;border-top:1px solid #283650;backdrop-filter:blur(16px);padding:9px max(12px,calc((100vw - 730px)/2));display:flex;justify-content:space-around;z-index:8}.nav{background:none;color:#8191ad;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 13px}.nav b{font-size:17px}.nav.active{color:#9fc2ff}
+.toast{position:fixed;bottom:85px;left:50%;transform:translateX(-50%);background:#263957;color:white;padding:9px 14px;border-radius:30px;font-size:11px;display:none;z-index:20}
+@media(min-width:700px){main{padding:25px 22px}.hero h1{font-size:38px}.bottom{max-width:760px;margin:auto}}
+</style></head>
+<body><div class="app">
+<header><div class="brand"><div class="logo">RB</div><div>RBLX AI <div class="muted" style="font-size:9px;letter-spacing:1.5px">SCRIPT BUILDER</div></div></div><span class="chip">DEEPSEEK READY</span></header>
+<main>
+<div class="hero"><div class="eyebrow">ROBLOX LUАU ASSISTANT</div><h1>สร้างสคริปต์เกม<br><span>ง่าย ๆ ด้วย AI</span></h1><p class="sub">พิมพ์สิ่งที่อยากได้ ให้ AI ช่วยเขียน Luau แล้วคัดลอกหรือ Export ไปใช้ใน Roblox Studio</p></div>
+<div class="tabs"><button class="tab active" data-page="chat">✦ AI Chat</button><button class="tab" data-page="bridge">⌁ Connect</button><button class="tab" data-page="editor">⌘ Script Editor</button><button class="tab" data-page="settings">⚙ ตั้งค่า</button></div>
+<section class="page active" id="chat">
+<div class="card"><div class="cardhead"><span class="title">AI Assistant</span><span class="chip">DeepSeek</span></div><div class="chatbox" id="messages"><div class="bubble assistant">สวัสดี! บอกฉันได้เลยว่าอยากสร้างระบบอะไรใน Roblox เช่น ระบบประตู ระบบวิ่ง ระบบเก็บของ หรือ UI มือถือ</div></div><div class="composer"><textarea id="prompt" rows="2" placeholder="เช่น สร้างระบบวิ่งเร็ว มีปุ่มบนมือถือ..."></textarea><button class="send" id="send">➤</button></div><div class="muted" style="margin-top:7px">AI จะช่วยเขียนโค้ดสำหรับเกมที่คุณมีสิทธิ์แก้ไข</div></div>
+<div class="card"><div class="title">ไอเดียเริ่มต้น</div><div class="row" style="flex-wrap:wrap;margin-top:10px"><button class="btn smallbtn idea">ระบบประตูเปิด-ปิด</button><button class="btn smallbtn idea">ระบบวิ่งเร็วบนมือถือ</button><button class="btn smallbtn idea">ระบบเก็บเหรียญ</button><button class="btn smallbtn idea">ระบบร้านค้า</button></div></div>
+</section>
+<section class="page" id="bridge">
+<div class="card"><div class="cardhead"><span class="title">Room Connection</span><span class="status" id="connStatus">NOT CONNECTED</span></div><p class="muted">สร้างรหัสห้องสำหรับจับคู่กับเครื่องมือ companion ที่คุณควบคุมได้ ระบบนี้เป็นหน้าจอสถานะตัวอย่าง ไม่เชื่อมต่อ Delta X หรืออ่าน/ควบคุมเกมผ่าน Executor</p><button class="btn primary full" id="makeRoom">＋ สร้างห้องใหม่</button><div id="roomBox" style="display:none"><label>ROOM ID</label><div class="row"><input id="roomId" readonly><button class="btn" id="copyRoom">คัดลอก</button></div><label>PAIRING TICKET</label><div class="row"><input id="ticket" readonly><button class="btn" id="copyTicket">คัดลอก</button></div><p class="muted">เก็บ Ticket ไว้เป็นความลับ ห้ามส่งให้คนอื่น</p></div></div>
+<div class="card"><div class="title">การเชื่อมต่อ Roblox</div><p class="muted">สำหรับการทำงานกับเกมจริง ให้ใช้ Roblox Studio และ Plugin/API ที่ได้รับอนุญาต เว็บนี้สามารถสร้างและ Export ไฟล์ .lua ได้</p></div>
+</section>
+<section class="page" id="editor">
+<div class="card"><div class="cardhead"><span class="title">Luau Code Editor</span><span class="chip">.lua</span></div><textarea id="code" class="codearea" spellcheck="false" placeholder="-- โค้ด Luau ที่สร้างจาก AI จะแสดงตรงนี้"></textarea><div class="row" style="margin-top:10px"><button class="btn" id="copyCode" style="flex:1">คัดลอกโค้ด</button><button class="btn primary" id="export" style="flex:1">Export .lua</button></div></div></section>
+<section class="page" id="settings">
+<div class="card"><div class="title">DeepSeek API Settings</div><p class="muted">ใส่ API Key ของคุณเพื่อใช้ AI โดยตรงจากเบราว์เซอร์ คีย์จะอยู่ในหน่วยความจำของหน้านี้เท่านั้นและหายเมื่อปิด/รีโหลดเว็บ</p><label>DeepSeek API Key</label><input id="apiKey" type="password" placeholder="sk-..." autocomplete="off"><div class="keynote">คำเตือน: การเรียก API จากหน้าเว็บอาจทำให้คีย์ถูกเปิดเผยต่อเครื่องมือของเบราว์เซอร์หรือส่วนขยาย อย่าใช้คีย์ที่มีสิทธิ์สำคัญหรือแชร์หน้านี้ให้ผู้อื่น หากเคยโพสต์คีย์ในแชต ให้เพิกถอนและสร้างคีย์ใหม่</div><button class="btn primary full" id="saveKey">ใช้คีย์นี้ในหน้านี้</button><p class="muted" id="keyState">ยังไม่ได้ตั้งค่า API Key</p></div>
+<div class="card"><div class="title">เกี่ยวกับเว็บ</div><p class="muted">RBLX AI · Mobile-first Luau assistant · ไม่ใช่ผลิตภัณฑ์ของ Roblox</p></div></section>
+</main>
+<nav class="bottom"><button class="nav active" data-page="chat"><b>✦</b>แชท AI</button><button class="nav" data-page="bridge"><b>⌁</b>เชื่อมต่อ</button><button class="nav" data-page="editor"><b>⌘</b>สคริปต์</button><button class="nav" data-page="settings"><b>⚙</b>ตั้งค่า</button></nav><div class="toast" id="toast"></div></div>
+<script>
+let apiKey="",room=null;
+const $=id=>document.getElementById(id);
+function toast(s){const t=$("toast");t.textContent=s;t.style.display="block";setTimeout(()=>t.style.display="none",1900)}
+function go(page){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("active",x.id===page));document.querySelectorAll("[data-page]").forEach(x=>x.classList.toggle("active",x.dataset.page===page));}
+document.querySelectorAll("[data-page]").forEach(x=>x.addEventListener("click",()=>go(x.dataset.page)));
+$("saveKey").onclick=()=>{apiKey=$("apiKey").value.trim();$("keyState").textContent=apiKey?"ตั้งค่า API Key ในหน้านี้แล้ว":"ยังไม่ได้ตั้งค่า API Key";toast(apiKey?"ตั้งค่าแล้ว":"กรุณาใส่ API Key")};
+function bubble(text,who){const d=document.createElement("div");d.className="bubble "+who;d.textContent=text;$("messages").appendChild(d);$("messages").scrollTop=$("messages").scrollHeight;return d}
+async function send(){const prompt=$("prompt").value.trim();if(!prompt)return;if(!apiKey){toast("ไปตั้งค่า DeepSeek API Key ก่อน");go("settings");return} $("prompt").value="";bubble(prompt,"user");const wait=bubble("กำลังคิดและเขียน Luau...","assistant");$("send").disabled=true;
+try{const r=await fetch("https://api.deepseek.com/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+apiKey},body:JSON.stringify({model:"deepseek-chat",temperature:.25,messages:[{role:"system",content:"You are a Roblox Luau coding assistant. Answer in Thai. Provide safe code only for games the user owns or is authorized to edit. Include complete code and clearly say whether it belongs in Script, LocalScript, or ModuleScript. Do not provide executor injection, exploit, anti-cheat bypass, or unauthorized game manipulation. When code is useful, put code in fenced lua blocks."},{role:"user",content:prompt}]})});const data=await r.json();if(!r.ok)throw Error(data.error?.message||"API error");const answer=data.choices?.[0]?.message?.content||"ไม่มีคำตอบ";wait.textContent=answer;const match=answer.match(/```(?:lua|luau)?\s*([\s\S]*?)```/i);if(match){$("code").value=match[1].trim();toast("นำโค้ดไปไว้ใน Script Editor แล้ว");}}
+catch(e){wait.textContent="เกิดข้อผิดพลาด: "+e.message+"\n\nตรวจสอบ API Key และการเชื่อมต่ออินเทอร์เน็ต"}finally{$("send").disabled=false}}
+$("send").onclick=send;$("prompt").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send()}});
+document.querySelectorAll(".idea").forEach(b=>b.onclick=()=>{$("prompt").value=b.textContent;go("chat");$("prompt").focus()});
+$("makeRoom").onclick=()=>{const rand=n=>Array.from(crypto.getRandomValues(new Uint8Array(n)),x=>x.toString(16).padStart(2,"0")).join("");room={id:"r_"+rand(9),ticket:rand(24)};$("roomId").value=room.id;$("ticket").value=room.ticket;$("roomBox").style.display="block";$("connStatus").textContent="ROOM CREATED";$("connStatus").classList.add("ok");toast("สร้างห้องแล้ว")};
+async function copy(id){try{await navigator.clipboard.writeText($(id).value||$(id).textContent);toast("คัดลอกแล้ว")}catch{toast("คัดลอกไม่สำเร็จ")}}
+$("copyRoom").onclick=()=>copy("roomId");$("copyTicket").onclick=()=>copy("ticket");$("copyCode").onclick=()=>copy("code");
+$("export").onclick=()=>{const blob=new Blob([$("code").value],{type:"text/plain;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="roblox-script.lua";a.click();URL.revokeObjectURL(url);toast("Export ไฟล์แล้ว")};
+</script></body></html>
